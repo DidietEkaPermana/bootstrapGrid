@@ -25,6 +25,8 @@ if (typeof jQuery === 'undefined') {
     var Grid = function (element, options) {
         //main
         this.rowLen = 0;
+        this.totalRow = 0;
+        this.serverAction = false;
         this.gridName = element.id;
         this.gridAddUpdateData = options.gridAddUpdateData;
         this.gridGetData = options.gridGetData;
@@ -32,6 +34,7 @@ if (typeof jQuery === 'undefined') {
         this.pageSizeOption = options.pageSizeOption;
         this.fields = options.fields;
         this.nullImage = options.nullImage;
+        this.serverAction = options.serverAction;
 
         //reff
         this.isReff = options.IsReff;
@@ -295,9 +298,24 @@ if (typeof jQuery === 'undefined') {
 
         getData: function () {
             var that = this;
-            $.post(this.gridGetData, { "__RequestVerificationToken": RequestVerificationToken }, function (result) {
+            var postData;
+
+            if (this.serverAction) {
+                postData = {
+                    "__RequestVerificationToken": RequestVerificationToken,
+                    iPage: this.pageGrid,
+                    iLength: this.rowLen,
+                    strSearch: ""
+                }
+            }
+            else {
+                postData = { "__RequestVerificationToken": RequestVerificationToken }
+            };
+
+            $.post(this.gridGetData, postData, function (result) {
                 if (result.total > 0) {
                     that.dataGrid = result.payload;
+                    that.totalRow = result.total;
                     that.refreshGrid();
                 }
                 else if (result.errors != null && result.errors.length > 0) {
@@ -323,10 +341,18 @@ if (typeof jQuery === 'undefined') {
             var datalen = (this.pageGrid * this.rowLen);
             var i = (this.pageGrid * this.rowLen) - this.rowLen;
 
-            var strFilter = $('#' + this.gridName + 'Table_Search').val();
+            if (this.serverAction)
+                var i = 0;
 
-            if (strFilter.length > 0)
-                dataToDisplay = this.filterData(strFilter);
+            if (!this.serverAction) {
+
+                var strFilter = $('#' + this.gridName + 'Table_Search').val();
+
+                if (strFilter.length > 0)
+                    dataToDisplay = this.filterData(strFilter);
+                else
+                    dataToDisplay = this.dataGrid;
+            }
             else
                 dataToDisplay = this.dataGrid;
 
@@ -436,7 +462,10 @@ if (typeof jQuery === 'undefined') {
             if (typeof that.dataGrid != "undefined") {
                 that.rowLen = $('#' + that.gridName + 'Table_PageSize').val();
                 that.pageGrid = 1;
-                that.refreshGrid();
+                if (that.serverAction)
+                    that.getData();
+                else
+                    that.refreshGrid();
             }
         },
 
@@ -451,8 +480,12 @@ if (typeof jQuery === 'undefined') {
             $('#' + that.gridName + 'AddEditModal').modal();
         },
 
-        gridPageBar_init: function(data) {
+        gridPageBar_init: function (data) {
             var totData = data.length;
+
+            if (this.serverAction)
+                totData = this.totalRow;
+
             var pageres = totData % this.rowLen;
             var page = (totData - pageres) / this.rowLen;
             if (pageres > 0)
@@ -492,7 +525,10 @@ if (typeof jQuery === 'undefined') {
         gridPageBar_Change: function (arg) {
             var that = arg.data;
             that.pageGrid = $(this).data("page");
-            that.refreshGrid();
+            if (that.serverAction)
+                that.getData();
+            else
+                that.refreshGrid();
         },
 
         filterData: function (arg) {
@@ -543,7 +579,7 @@ if (typeof jQuery === 'undefined') {
 
             $('#' + that.gridName + 'AddEditModal').modal();
 
-            var data = getObjects(that.dataGrid, that.keyFields, Id);
+            var data = that.getObjects(that.dataGrid, that.keyFields, Id);
 
             if (data.length > 0) {
                 that.fillAddEdit(data);
@@ -650,24 +686,20 @@ if (typeof jQuery === 'undefined') {
                     }
                 }
             }
-        }
-    }
-    
-    /*  
-     * Helper function
-     * Searching helper
-     */
-    function getObjects(obj, key, val) {
-        var objects = [];
-        for (var i in obj) {
-            if (!obj.hasOwnProperty(i)) continue;
-            if (typeof obj[i] == 'object') {
-                objects = objects.concat(getObjects(obj[i], key, val));
-            } else if (i == key && obj[key] == val) {
-                objects.push(obj);
+        },
+
+        getObjects: function (obj, key, val) {
+            var objects = [];
+            for (var i in obj) {
+                if (!obj.hasOwnProperty(i)) continue;
+                if (typeof obj[i] == 'object') {
+                    objects = objects.concat(this.getObjects(obj[i], key, val));
+                } else if (i == key && obj[key] == val) {
+                    objects.push(obj);
+                }
             }
+            return objects;
         }
-        return objects;
     }
 
     // GRID PLUGIN DEFINITION

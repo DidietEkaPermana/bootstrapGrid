@@ -62,6 +62,46 @@ namespace SampleWebApp.Controllers
 
             return Json(data);
         }
+
+        public async Task<JsonResult> ReadClient(int iPage, int iLength, string strSearch)
+        {
+            JsonData data = new JsonData();
+
+            try
+            {
+                int iPageStart = (int)((iPage - 1) * iLength);
+
+                data.payload = (await db.Clients.OrderBy(p => p.ClientId).Skip(iPageStart).Take((int)iLength).ToListAsync())
+                    .Select(p => new Client
+                    {
+                        ClientId = p.ClientId,
+                        FirstName = p.FirstName,
+                        MiddleName = p.MiddleName,
+                        LastName = p.LastName,
+                        Gender = p.Gender,
+                        DateOfBirth = p.DateOfBirth,
+                        CreditRating = p.CreditRating,
+                        XCode = p.XCode,
+                        OccupationId = p.OccupationId,
+                        Occupation = new Occupation { OccupationId = p.Occupation.OccupationId, OccupationName = p.Occupation.OccupationName },
+                        TelephoneNumber = p.TelephoneNumber,
+                        Street1 = p.Street1,
+                        Street2 = p.Street2,
+                        City = p.City,
+                        ZipCode = p.ZipCode,
+                        Latitude = p.Latitude,
+                        Longitude = p.Longitude,
+                        Notes = p.Notes
+                    }).ToList();
+                data.total = (await db.Clients.CountAsync());
+            }
+            catch (Exception ex)
+            {
+                data.errors = ex.Message;
+            }
+
+            return Json(data);
+        }
         #endregion API request
 
         protected override void Dispose(bool disposing)

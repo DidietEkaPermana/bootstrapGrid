@@ -51,9 +51,10 @@
                     { title: 'Lat', name: 'Latitude', datatype: 'number' },
                     { title: 'Notes', name: 'Notes', datatype: 'string', display: false }
                 ],
-                nullImage: "../Content/Images/avatar.png",
+                //serverAction: true, //newly added, if paging and search, it would take query to server
                 gridAddUpdateData: "/Client/AddUpdateClient",
                 gridGetData: "/Client/GetClientList",
+                //gridGetData: "/Client/ReadClient",
                 gridDeleteData: "/Client/DeleteClient"
             });
         })
