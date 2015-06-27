@@ -1,0 +1,45 @@
+﻿@{
+    ViewBag.Title = "Occupation";
+}
+
+@section Headers {
+    <link href="~/Content/bsComp/bootstrap-select.min.css" rel="stylesheet" />
+    <link href="~/Content/bsComp/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <style>
+        .bootstrap-select.btn-group:not(.input-group-btn) {
+            margin-top: 10px;
+        }
+
+        input, select, textarea {
+            max-width: none;
+        }
+    </style>
+}
+@Html.AntiForgeryToken()
+<h2>@ViewBag.Title</h2>
+
+<div id="@ViewBag.Title"></div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/moment.min.js"></script>
+    <script src="~/Scripts/bsComp/bootstrap-select.min.js"></script>
+    <script src="~/Scripts/bsComp/bootstrap-datetimepicker.min.js"></script>
+    <script src="~/Scripts/bsComp/bootstrapGrid.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#@ViewBag.Title').grid({
+                pageSizeOption: [5, 10, 15, 25, 50],
+                fields: [
+                    { title: 'ID', name: 'OccupationId', datatype: 'int', key: true },
+                    { title: 'Occupation', name: 'OccupationName', datatype: 'string' }
+                ],
+                //serverAction: true, //newly added, if paging and search, it would take query to server
+                gridAddUpdateData: "/Occupation/AddUpdateOccupation",
+                gridGetData: "/Occupation/GetOccupationList",
+                //gridGetData: "/Occupation/ReadOccupation",
+                gridDeleteData: "/Occupation/DeleteOccupation"
+            });
+        })
+    </script>
+}

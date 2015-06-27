@@ -235,6 +235,8 @@
     <Content Include="Scripts\bsComp\bootstrap-select.min.js.map">
       <DependentUpon>bootstrap-select.min.js</DependentUpon>
     </Content>
+    <None Include="Properties\PublishProfiles\BizTalkWeb - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\BizTalkWeb - Web Deplo.pubxml" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Icon.png" />
     <Content Include="Scripts\bootstrap.js" />
@@ -278,7 +280,9 @@
       <DependentUpon>respond.js</DependentUpon>
     </Content>
     <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -328,10 +332,10 @@
     <Content Include="Scripts\moment.min.js.map">
       <DependentUpon>moment.min.js</DependentUpon>
     </Content>
+    <Content Include="Views\Occupation\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Occupation\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

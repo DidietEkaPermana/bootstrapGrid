@@ -26,6 +26,48 @@ namespace SampleWebApp.Controllers
 
         #region API request
         [ValidateAntiForgeryToken]
+		public async Task<JsonResult> AddUpdateClient(Client dataClient)
+        {
+			JsonData data = new JsonData();
+
+            try
+            {
+                if (dataClient.ClientId == 0)
+                    return await CreateClient(dataClient);
+                else
+                    return await UpdateClient(dataClient);
+            }
+            catch (Exception ex)
+            {
+                data.errors = ex.Message;
+            }
+
+			return Json(data);
+        }
+
+        private async Task<JsonResult> CreateClient(Client dataClient)
+        {
+			JsonData data = new JsonData();
+
+            try
+            {
+                db.Clients.Add(dataClient);
+
+                await db.SaveChangesAsync();
+
+                data.payload = dataClient;
+
+				data.total = 1;
+            }
+            catch (Exception ex)
+            {
+                data.errors = ex.Message;
+            }
+
+			return Json(data);
+        }
+
+        [ValidateAntiForgeryToken]
         public async Task<JsonResult> GetClientList()
         {
             JsonData data = new JsonData();
@@ -63,6 +105,7 @@ namespace SampleWebApp.Controllers
             return Json(data);
         }
 
+        [ValidateAntiForgeryToken]
         public async Task<JsonResult> ReadClient(int iPage, int iLength, string strSearch)
         {
             JsonData data = new JsonData();
@@ -94,6 +137,50 @@ namespace SampleWebApp.Controllers
                         Notes = p.Notes
                     }).ToList();
                 data.total = (await db.Clients.CountAsync());
+            }
+            catch (Exception ex)
+            {
+                data.errors = ex.Message;
+            }
+
+            return Json(data);
+        }
+
+        private async Task<JsonResult> UpdateClient(Client dataClient)
+        {
+            JsonData data = new JsonData();
+
+            try
+            {
+                db.Entry(dataClient).State = EntityState.Modified;
+                await db.SaveChangesAsync();
+
+                data.payload = dataClient;
+
+				data.total = 1;
+            }
+            catch (Exception ex)
+            {
+                data.errors = ex.Message;
+            }
+
+            return Json(data);
+        }
+
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> DeleteClient(int id)
+        {
+            JsonData data = new JsonData();
+
+            try
+            {
+                Client dataClient = await db.Clients.FindAsync(id);
+                db.Clients.Remove(dataClient);
+                await db.SaveChangesAsync();
+
+                data.payload = dataClient;
+
+				data.total = 1;
             }
             catch (Exception ex)
             {
