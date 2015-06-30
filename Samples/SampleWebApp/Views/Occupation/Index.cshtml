@@ -5,15 +5,7 @@
 @section Headers {
     <link href="~/Content/bsComp/bootstrap-select.min.css" rel="stylesheet" />
     <link href="~/Content/bsComp/bootstrap-datetimepicker.min.css" rel="stylesheet" />
-    <style>
-        .bootstrap-select.btn-group:not(.input-group-btn) {
-            margin-top: 10px;
-        }
-
-        input, select, textarea {
-            max-width: none;
-        }
-    </style>
+    <link href="~/Content/bsComp/bootstrapGrid.min.css" rel="stylesheet" />
 }
 @Html.AntiForgeryToken()
 <h2>@ViewBag.Title</h2>
@@ -24,8 +16,9 @@
     @Scripts.Render("~/bundles/jqueryval")
     <script src="~/Scripts/moment.min.js"></script>
     <script src="~/Scripts/bsComp/bootstrap-select.min.js"></script>
+    <script src="~/Scripts/bsComp/bootstrap-modalloading.js"></script>
     <script src="~/Scripts/bsComp/bootstrap-datetimepicker.min.js"></script>
-    <script src="~/Scripts/bsComp/bootstrapGrid.js"></script>
+    <script src="~/Scripts/bsComp/bootstrapGrid.min.js"></script>
     <script>
         $(document).ready(function () {
             $('#@ViewBag.Title').grid({

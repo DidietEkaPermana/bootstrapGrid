@@ -208,6 +208,10 @@
     <Content Include="Content\bsComp\bootstrap-select.min.css">
       <DependentUpon>bootstrap-select.css</DependentUpon>
     </Content>
+    <Content Include="Content\bsComp\bootstrapGrid.css" />
+    <Content Include="Content\bsComp\bootstrapGrid.min.css">
+      <DependentUpon>bootstrapGrid.css</DependentUpon>
+    </Content>
     <Content Include="Content\Images\avatar.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -223,6 +227,10 @@
     <Content Include="Scripts\bsComp\bootstrap-datetimepicker.min.js">
       <DependentUpon>bootstrap-datetimepicker.js</DependentUpon>
     </Content>
+    <Content Include="Scripts\bsComp\bootstrap-modalloading.js" />
+    <Content Include="Scripts\bsComp\bootstrap-modalloading.min.js">
+      <DependentUpon>bootstrap-modalloading.js</DependentUpon>
+    </Content>
     <Content Include="Scripts\bsComp\bootstrap-select.min.js">
       <DependentUpon>bootstrap-select.js</DependentUpon>
     </Content>
@@ -237,6 +245,9 @@
     </Content>
     <None Include="Properties\PublishProfiles\BizTalkWeb - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\BizTalkWeb - Web Deplo.pubxml" />
+    <Content Include="Scripts\bsComp\bootstrap-modalloading.min.js.map">
+      <DependentUpon>bootstrap-modalloading.min.js</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Icon.png" />
     <Content Include="Scripts\bootstrap.js" />

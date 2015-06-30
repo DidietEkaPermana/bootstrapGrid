@@ -1,6 +1,6 @@
 ﻿//! bootstrapGrid.js
-//! version : 0.0.2
-//! authors : Didiet Eka Permana
+//! version : 0.0.4
+//! authors : Didiet Eka Permana (didiet.permana@gmail.com)
 //! license : MIT
 
 if (typeof jQuery === 'undefined') {
@@ -48,7 +48,7 @@ if (typeof jQuery === 'undefined') {
         this.init(element);
     };
 
-    Grid.VERSION = '0.0.1'
+    Grid.VERSION = '0.0.4'
 
     Grid.prototype = {
         constructor: Grid,
@@ -82,68 +82,13 @@ if (typeof jQuery === 'undefined') {
             $('#' + this.gridName + 'Table_Search').keyup(this, this.Table_Search_Change);
             $('#' + this.gridName + 'Table_PageSize').change(this, this.Table_PageSize_Change);
 
+            $('#' + this.gridName + 'gridRefresh').click(this, this.refreshData);
+
             this.initReff();
         },
 
         templateTable: function () {
-            if (this.isReff) {
-                return ' \
-                    <div class="modal fade" id="' + this.gridName + 'Dialog"> \
-                        <div class="modal-dialog"> \
-                            <div class="modal-content"> \
-                                <div class="modal-header"> \
-                                    <button type="button" class="close" data-dismiss="modal" data-toggle="modal" data-target="#' + this.caller + 'AddEditModal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button> \
-                                    <h4 class="modal-title">Refference ' + this.gridName + '</h4> \
-                                </div> \
-                                <div class="modal-body"> \
-<div class="container-fluid row clearfix" id="' + this.gridName + 'Table">\
-                    <div class="navbar navbar-default">\
-                        <div class="navbar-header">\
-                            <button class="navbar-toggle" data-target=".navbar-inverse-collapse" data-toggle="collapse" type="button">\
-                                <span class="icon-bar"></span>\
-                                <span class="icon-bar"></span>\
-                                <span class="icon-bar"></span>\
-                            </button>\
-                        </div>\
-                        <div class="navbar-collapse navbar-inverse-collapse collapse">\
-                            <form class="navbar-form navbar-right">\
-                                <input class="form-control col-lg-8" placeholder="Search" type="text" id="' + this.gridName + 'Table_Search" />\
-                            </form>\
-                        </div>\
-                    </div>\
-                    <table class="table table-hover">\
-                        <thead id="' + this.gridName + 'Table_Header"></thead>\
-                        <tbody id="' + this.gridName + 'Table_Content"></tbody>\
-                    </table>\
-                    <div class="navbar navbar-default">\
-                        <div class="navbar-header">\
-                            <button class="navbar-toggle" data-target=".navbar-inverse-collapse" data-toggle="collapse" type="button">\
-                                <span class="icon-bar"></span>\
-                                <span class="icon-bar"></span>\
-                                <span class="icon-bar"></span>\
-                            </button>\
-                        </div>\
-                        <div class="navbar-collapse navbar-inverse-collapse collapse">\
-                            <ul class="nav navbar-nav">\
-                                <li>\
-                                    <select id="' + this.gridName + 'Table_PageSize"></select>\
-                                </li>\
-                            </ul>\
-                            <ul class="nav navbar-nav navbar-right" id="' + this.gridName + 'gridPageBar"></ul>\
-                        </div>\
-                    </div>\
-                </div> \
-                                </div> \
-                                <div class="modal-footer"> \
-                                    <a class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target="#' + this.caller + 'AddEditModal">Close</a> \
-                                </div> \
-                            </div> \
-                        </div> \
-                    </div> \
-                ';
-            }
-            else {
-                return '<div class="container-fluid row clearfix" id="' + this.gridName + 'Table">\
+            var strHtml = '<div class="bsGridCompCSS container-fluid row clearfix" tabindex="999" id="' + this.gridName + 'Table">\
                     <div class="navbar navbar-default">\
                         <div class="navbar-header">\
                             <button class="navbar-toggle" data-target=".navbar-inverse-collapse" data-toggle="collapse" type="button">\
@@ -174,16 +119,42 @@ if (typeof jQuery === 'undefined') {
                             </button>\
                         </div>\
                         <div class="navbar-collapse navbar-inverse-collapse collapse">\
-                            <ul class="nav navbar-nav">\
+                            <ul class="nav navbar-nav navbar-form">\
                                 <li>\
                                     <select id="' + this.gridName + 'Table_PageSize"></select>\
+                                </li>\
+                            </ul>\
+                            <ul class="nav navbar-nav navbar-right">\
+                                <li>\
+                                    <a href="#" id="' + this.gridName + 'gridRefresh" >\
+                                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>\
+                                    </a>\
                                 </li>\
                             </ul>\
                             <ul class="nav navbar-nav navbar-right" id="' + this.gridName + 'gridPageBar"></ul>\
                         </div>\
                     </div>\
                 </div>';
+            if (this.isReff) {
+                return ' \
+                    <div class="modal fade" id="' + this.gridName + 'Dialog"> \
+                        <div class="modal-dialog"> \
+                            <div class="modal-content"> \
+                                <div class="modal-header"> \
+                                    <button type="button" class="close" data-dismiss="modal" data-toggle="modal" data-target="#' + this.caller + 'AddEditModal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button> \
+                                    <h4 class="modal-title">Refference ' + this.gridName + '</h4> \
+                                </div> \
+                                <div class="modal-body"> ' + strHtml + ' </div> \
+                                <div class="modal-footer"> \
+                                    <a class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target="#' + this.caller + 'AddEditModal">Close</a> \
+                                </div> \
+                            </div> \
+                        </div> \
+                    </div> \
+                ';
             }
+
+            return strHtml;
         },
 
         templateAddEdit: function () {
@@ -195,7 +166,7 @@ if (typeof jQuery === 'undefined') {
 
 
             return ' \
-                    <div class="modal fade" id="' + this.gridName + 'AddEditModal"> \
+                    <div class="bsGridDialogCompCSS modal fade" id="' + this.gridName + 'AddEditModal"> \
                         <div class="modal-dialog"> \
                             <div class="modal-content"> \
                                 <div class="modal-header"> \
@@ -320,6 +291,11 @@ if (typeof jQuery === 'undefined') {
             }
         },
 
+        refreshData: function(arg){
+            var that = arg.data;
+            that.getData();
+        },
+
         getData: function () {
             var that = this;
             var postData;
@@ -336,16 +312,21 @@ if (typeof jQuery === 'undefined') {
                 postData = { "__RequestVerificationToken": RequestVerificationToken };
             }
 
+            waitingDialog.show('Please wait', { dialogSize: 'sm', progressType: 'warning' });
+
             $.post(this.gridGetData, postData, function (result) {
                 if (result.total > 0) {
                     that.dataGrid = result.payload;
                     that.totalRow = result.total;
                     that.refreshGrid();
+                    waitingDialog.hide();
                 }
                 else if (result.errors != null && result.errors.length > 0) {
+                    waitingDialog.hide();
                     alert(result.errors);
                 }
                 else if (result.total == 0) {
+                    waitingDialog.hide();
                     $("#" + this.gridName + "Table_Content").empty();
                     var htmlContent = '<tr>';
                     htmlContent += '<td colspan="' + this.fields.length + '">No data exists</td>';
@@ -353,9 +334,11 @@ if (typeof jQuery === 'undefined') {
                     $("#" + this.gridName + "Table_Content").append(htmlContent);
                 }
                 else {
+                    waitingDialog.hide();
                     alert("Generic error");
                 }
             }).fail(function (jqXHR, textStatus, errorThrown) {
+                waitingDialog.hide();
                 alert("Got some error: " + errorThrown);
             });
         },
@@ -665,18 +648,23 @@ if (typeof jQuery === 'undefined') {
         gridPageBar_Delete: function (arg) {
             var that = arg.data;
             if (confirm("Are you sure you want to delete this record?")) {
+                waitingDialog.show('Please wait', { dialogSize: 'sm', progressType: 'warning' });
                 $.post(that.gridDeleteData, { "__RequestVerificationToken": RequestVerificationToken, ID: $(this).data("id") }, function (result) {
                     if (result.total >= 0) {
+                        waitingDialog.hide();
                         alert("Record deleted");
                         that.getData();
                     }
                     else if (result.errors.length > 0) {
+                        waitingDialog.hide();
                         alert(result.errors);
                     }
                     else {
+                        waitingDialog.hide();
                         alert("Generic error");
                     }
                 }).fail(function (jqXHR, textStatus, errorThrown) {
+                    waitingDialog.hide();
                     alert("Got some error: " + errorThrown);
                 });
             }
@@ -763,21 +751,26 @@ if (typeof jQuery === 'undefined') {
 
                 data += "}";
 
-                console.log(data);
-                console.log(JSON.parse(data));
+                //console.log(data);
+                //console.log(JSON.parse(data));
 
+                waitingDialog.show('Please wait', { dialogSize: 'sm', progressType: 'warning' });
                 $.post(that.gridAddUpdateData, JSON.parse(data), function (result) {
                     if (result.total >= 0) {
                         that.getData();
                         $('#' + that.gridName + 'AddEditModal').modal('hide');
+                        waitingDialog.hide();
                     }
                     else if (result.errors.length > 0) {
+                        waitingDialog.hide();
                         alert(result.errors);
                     }
                     else {
+                        waitingDialog.hide();
                         alert("Generic error");
                     }
                 }).fail(function (jqXHR, textStatus, errorThrown) {
+                    waitingDialog.hide();
                     alert("Got some error: " + errorThrown);
                 });
             }
