@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2013 for Web
+# Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{D7F71C7F-F95F-4C2D-B303-9B3376B097C6}"
@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{D7F7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Grid", "Grid", "{33EA9442-7D5F-4386-B816-3E273D8C6EE5}"
 	ProjectSection(SolutionItems) = preProject
+		Samples\SampleWebApp\Content\bsComp\bootstrapGrid.css = Samples\SampleWebApp\Content\bsComp\bootstrapGrid.css
 		Scripts\Grid\bootstrapGrid.js = Scripts\Grid\bootstrapGrid.js
 	EndProjectSection
 EndProject

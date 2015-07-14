@@ -17,7 +17,7 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
     <script src="~/Scripts/moment.min.js"></script>
-    <script src="~/Scripts/bsComp/bootstrap-modalloading.js"></script>
+    <script src="~/Scripts/bsComp/bootstrap-modalloading.min.js"></script>
     <script src="~/Scripts/bsComp/bootstrap-select.min.js"></script>
     <script src="~/Scripts/bsComp/bootstrap-datetimepicker.min.js"></script>
     <script src="~/Scripts/bsComp/bootstrapGrid.min.js"></script>
@@ -44,7 +44,7 @@
                     { title: 'Lat', name: 'Latitude', datatype: 'number' },
                     { title: 'Notes', name: 'Notes', datatype: 'string', display: false }
                 ],
-                serverAction: true, //newly added, if paging and search, it would take query to server
+                serverAction: true, //if paging and search, it would take query to server
                 gridAddUpdateData: "/Client/AddUpdateClient",
                 //gridGetData: "/Client/GetClientList",
                 gridGetData: "/Client/ReadClient",

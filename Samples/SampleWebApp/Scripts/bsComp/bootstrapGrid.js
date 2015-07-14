@@ -612,36 +612,34 @@ if (typeof jQuery === 'undefined') {
         fillAddEdit: function (data) {
             var fields = this.fields;
             for (var j = 0; j < fields.length; j++) {
-                //if (fields[j]['display'] != false) {
-                    if (fields[j]['datatype'] == 'date') {
-                        $('#input' + fields[j]['name']).val(moment(data[0][fields[j]['name']]).format(fields[j]['format']));
+                if (fields[j]['datatype'] == 'date') {
+                    $('#input' + fields[j]['name']).val(moment(data[0][fields[j]['name']]).format(fields[j]['format']));
+                }
+                else if (fields[j]['datatype'] == 'image') {
+                    if (data[0].SourceIcon == null)
+                        $('#input' + fields[j]['name']).attr("src", this.nullImage);
+                    else
+                        $('#input' + fields[j]['name']).attr("src", data[0][fields[j]['name']]);
+                }
+                else if (fields[j]['datatype'] == 'enum') {
+                    $('#input' + fields[j]['name']).selectpicker('val', data[0][fields[j]['name']]);
+                }
+                else if (fields[j]['datatype'] == 'int') {
+                    if (fields[j]['reff'] != null) {
+                        $('#input' + fields[j]['name']).val(this.reffName(data[0], fields[j]['reffName']));
+                        $('#input' + fields[j]['name']).data("id", data[0][fields[j]['name']]);
                     }
-                    else if (fields[j]['datatype'] == 'image') {
-                        if (data[0].SourceIcon == null)
-                            $('#input' + fields[j]['name']).attr("src", this.nullImage);
-                        else
-                            $('#input' + fields[j]['name']).attr("src", data[0][fields[j]['name']]);
+                    else
+                        $('#input' + fields[j]['name']).val(data[0][fields[j]['name']]);
+                }
+                else {
+                    if (fields[j]['reff'] != null) {
+                        $('#input' + fields[j]['name']).val(this.reffName(data[0], fields[j]['reffName']));
+                        $('#input' + fields[j]['name']).data("id", data[0][fields[j]['name']]);
                     }
-                    else if (fields[j]['datatype'] == 'enum') {
-                        $('#input' + fields[j]['name']).selectpicker('val', data[0][fields[j]['name']]);
-                    }
-                    else if (fields[j]['datatype'] == 'int') {
-                        if (fields[j]['reff'] != null) {
-                            $('#input' + fields[j]['name']).val(this.reffName(data[0], fields[j]['reffName']));
-                            $('#input' + fields[j]['name']).data("id", data[0][fields[j]['name']]);
-                        }
-                        else
-                            $('#input' + fields[j]['name']).val(data[0][fields[j]['name']]);
-                    }
-                    else {
-                        if (fields[j]['reff'] != null) {
-                            $('#input' + fields[j]['name']).val(this.reffName(data[0], fields[j]['reffName']));
-                            $('#input' + fields[j]['name']).data("id", data[0][fields[j]['name']]);
-                        }
-                        else
-                            $('#input' + fields[j]['name']).val(data[0][fields[j]['name']]);
-                    }
-                //}
+                    else
+                        $('#input' + fields[j]['name']).val(data[0][fields[j]['name']]);
+                }
             }
         },
 
@@ -694,68 +692,36 @@ if (typeof jQuery === 'undefined') {
             var fields = that.fields;
 
             if (that.formValidator.valid()) {
-                var data = '{';
-                var isFirst = true;
+                var data = {};
 
-                isFirst = false;
-                data += '"__RequestVerificationToken" : "' + RequestVerificationToken + '"';
+                data["__RequestVerificationToken"] = RequestVerificationToken;
 
                 for (var j = 0; j < fields.length; j++) {
                     if (fields[j]['datatype'] == 'date') {
-                        if (isFirst)
-                            isFirst = false;
-                        else
-                            data += ", ";
-
-                        data += '"' + fields[j]['name'] + '": ' + moment($('#input' + fields[j]['name']).val(), fields[j]['format']);
+                        data[fields[j]['name']] = $('#input' + fields[j]['name']).val();
                     }
                     else if (fields[j]['datatype'] == 'image') {
-                        if (isFirst)
-                            isFirst = false;
-                        else
-                            data += ", ";
-
-                        data += '"' + fields[j]['name'] + '": "' + $('#input' + fields[j]['name']).attr("src") + '"';
+                        data[fields[j]['name']] = $('#input' + fields[j]['name']).attr("src");
                     }
                     else if (fields[j]['datatype'] == 'enum') {
-                        if (isFirst)
-                            isFirst = false;
-                        else
-                            data += ", ";
-
-                        data += '"' + fields[j]['name'] + '": "' + $('#input' + fields[j]['name']).selectpicker('val') + '"';
+                        data[fields[j]['name']] = $('#input' + fields[j]['name']).selectpicker('val');
                     }
                     else if (fields[j]['datatype'] == 'int') {
-                        if (isFirst)
-                            isFirst = false;
-                        else
-                            data += ", ";
-
                         if (fields[j]['reff'] != null)
-                            data += '"' + fields[j]['name'] + '": ' + $('#input' + fields[j]['name']).data("id");
+                            data[fields[j]['name']] = $('#input' + fields[j]['name']).data("id");
                         else
-                            data += '"' + fields[j]['name'] + '": ' + $('#input' + fields[j]['name']).val();
+                            data[fields[j]['name']] = $('#input' + fields[j]['name']).val();
                     }
                     else {
-                        if (isFirst)
-                            isFirst = false;
-                        else
-                            data += ", ";
-
                         if (fields[j]['reff'] != null)
-                            data += '"' + fields[j]['name'] + '": "' + $('#input' + fields[j]['name']).data("id") + '"';
+                            data[fields[j]['name']] = $('#input' + fields[j]['name']).data("id");
                         else
-                            data += '"' + fields[j]['name'] + '": "' + $('#input' + fields[j]['name']).val() + '"';
+                            data[fields[j]['name']] = $('#input' + fields[j]['name']).val();
                     }
                 }
 
-                data += "}";
-
-                //console.log(data);
-                //console.log(JSON.parse(data));
-
                 waitingDialog.show('Please wait', { dialogSize: 'sm', progressType: 'warning' });
-                $.post(that.gridAddUpdateData, JSON.parse(data), function (result) {
+                $.post(that.gridAddUpdateData, data, function (result) {
                     if (result.total >= 0) {
                         that.getData();
                         $('#' + that.gridName + 'AddEditModal').modal('hide');

@@ -1,5 +1,5 @@
 ﻿//! bootstrapGrid.js
-//! version : 0.0.3
+//! version : 0.0.4
 //! authors : Didiet Eka Permana (didiet.permana@gmail.com)
 //! license : MIT
 
@@ -48,7 +48,7 @@ if (typeof jQuery === 'undefined') {
         this.init(element);
     };
 
-    Grid.VERSION = '0.0.1'
+    Grid.VERSION = '0.0.4'
 
     Grid.prototype = {
         constructor: Grid,
@@ -82,68 +82,13 @@ if (typeof jQuery === 'undefined') {
             $('#' + this.gridName + 'Table_Search').keyup(this, this.Table_Search_Change);
             $('#' + this.gridName + 'Table_PageSize').change(this, this.Table_PageSize_Change);
 
+            $('#' + this.gridName + 'gridRefresh').click(this, this.refreshData);
+
             this.initReff();
         },
 
         templateTable: function () {
-            if (this.isReff) {
-                return ' \
-                    <div class="modal fade" id="' + this.gridName + 'Dialog"> \
-                        <div class="modal-dialog"> \
-                            <div class="modal-content"> \
-                                <div class="modal-header"> \
-                                    <button type="button" class="close" data-dismiss="modal" data-toggle="modal" data-target="#' + this.caller + 'AddEditModal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button> \
-                                    <h4 class="modal-title">Refference ' + this.gridName + '</h4> \
-                                </div> \
-                                <div class="modal-body"> \
-<div class="container-fluid row clearfix" id="' + this.gridName + 'Table">\
-                    <div class="navbar navbar-default">\
-                        <div class="navbar-header">\
-                            <button class="navbar-toggle" data-target=".navbar-inverse-collapse" data-toggle="collapse" type="button">\
-                                <span class="icon-bar"></span>\
-                                <span class="icon-bar"></span>\
-                                <span class="icon-bar"></span>\
-                            </button>\
-                        </div>\
-                        <div class="navbar-collapse navbar-inverse-collapse collapse">\
-                            <form class="navbar-form navbar-right">\
-                                <input class="form-control col-lg-8" placeholder="Search" type="text" id="' + this.gridName + 'Table_Search" />\
-                            </form>\
-                        </div>\
-                    </div>\
-                    <table class="table table-hover">\
-                        <thead id="' + this.gridName + 'Table_Header"></thead>\
-                        <tbody id="' + this.gridName + 'Table_Content"></tbody>\
-                    </table>\
-                    <div class="navbar navbar-default">\
-                        <div class="navbar-header">\
-                            <button class="navbar-toggle" data-target=".navbar-inverse-collapse" data-toggle="collapse" type="button">\
-                                <span class="icon-bar"></span>\
-                                <span class="icon-bar"></span>\
-                                <span class="icon-bar"></span>\
-                            </button>\
-                        </div>\
-                        <div class="navbar-collapse navbar-inverse-collapse collapse">\
-                            <ul class="nav navbar-nav">\
-                                <li>\
-                                    <select id="' + this.gridName + 'Table_PageSize"></select>\
-                                </li>\
-                            </ul>\
-                            <ul class="nav navbar-nav navbar-right" id="' + this.gridName + 'gridPageBar"></ul>\
-                        </div>\
-                    </div>\
-                </div> \
-                                </div> \
-                                <div class="modal-footer"> \
-                                    <a class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target="#' + this.caller + 'AddEditModal">Close</a> \
-                                </div> \
-                            </div> \
-                        </div> \
-                    </div> \
-                ';
-            }
-            else {
-                return '<div class="container-fluid row clearfix" id="' + this.gridName + 'Table">\
+            var strHtml = '<div class="bsGridCompCSS container-fluid row clearfix" tabindex="999" id="' + this.gridName + 'Table">\
                     <div class="navbar navbar-default">\
                         <div class="navbar-header">\
                             <button class="navbar-toggle" data-target=".navbar-inverse-collapse" data-toggle="collapse" type="button">\
@@ -174,16 +119,42 @@ if (typeof jQuery === 'undefined') {
                             </button>\
                         </div>\
                         <div class="navbar-collapse navbar-inverse-collapse collapse">\
-                            <ul class="nav navbar-nav">\
+                            <ul class="nav navbar-nav navbar-form">\
                                 <li>\
                                     <select id="' + this.gridName + 'Table_PageSize"></select>\
+                                </li>\
+                            </ul>\
+                            <ul class="nav navbar-nav navbar-right">\
+                                <li>\
+                                    <a href="#" id="' + this.gridName + 'gridRefresh" >\
+                                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>\
+                                    </a>\
                                 </li>\
                             </ul>\
                             <ul class="nav navbar-nav navbar-right" id="' + this.gridName + 'gridPageBar"></ul>\
                         </div>\
                     </div>\
                 </div>';
+            if (this.isReff) {
+                return ' \
+                    <div class="modal fade" id="' + this.gridName + 'Dialog"> \
+                        <div class="modal-dialog"> \
+                            <div class="modal-content"> \
+                                <div class="modal-header"> \
+                                    <button type="button" class="close" data-dismiss="modal" data-toggle="modal" data-target="#' + this.caller + 'AddEditModal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button> \
+                                    <h4 class="modal-title">Refference ' + this.gridName + '</h4> \
+                                </div> \
+                                <div class="modal-body"> ' + strHtml + ' </div> \
+                                <div class="modal-footer"> \
+                                    <a class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target="#' + this.caller + 'AddEditModal">Close</a> \
+                                </div> \
+                            </div> \
+                        </div> \
+                    </div> \
+                ';
             }
+
+            return strHtml;
         },
 
         templateAddEdit: function () {
@@ -195,7 +166,7 @@ if (typeof jQuery === 'undefined') {
 
 
             return ' \
-                    <div class="modal fade" id="' + this.gridName + 'AddEditModal"> \
+                    <div class="bsGridDialogCompCSS modal fade" id="' + this.gridName + 'AddEditModal"> \
                         <div class="modal-dialog"> \
                             <div class="modal-content"> \
                                 <div class="modal-header"> \
@@ -318,6 +289,11 @@ if (typeof jQuery === 'undefined') {
                     }
                 }
             }
+        },
+
+        refreshData: function (arg) {
+            var that = arg.data;
+            that.getData();
         },
 
         getData: function () {
@@ -636,7 +612,6 @@ if (typeof jQuery === 'undefined') {
         fillAddEdit: function (data) {
             var fields = this.fields;
             for (var j = 0; j < fields.length; j++) {
-                //if (fields[j]['display'] != false) {
                 if (fields[j]['datatype'] == 'date') {
                     $('#input' + fields[j]['name']).val(moment(data[0][fields[j]['name']]).format(fields[j]['format']));
                 }
@@ -665,7 +640,6 @@ if (typeof jQuery === 'undefined') {
                     else
                         $('#input' + fields[j]['name']).val(data[0][fields[j]['name']]);
                 }
-                //}
             }
         },
 
@@ -718,68 +692,36 @@ if (typeof jQuery === 'undefined') {
             var fields = that.fields;
 
             if (that.formValidator.valid()) {
-                var data = '{';
-                var isFirst = true;
+                var data = {};
 
-                isFirst = false;
-                data += '"__RequestVerificationToken" : "' + RequestVerificationToken + '"';
+                data["__RequestVerificationToken"] = RequestVerificationToken;
 
                 for (var j = 0; j < fields.length; j++) {
                     if (fields[j]['datatype'] == 'date') {
-                        if (isFirst)
-                            isFirst = false;
-                        else
-                            data += ", ";
-
-                        data += '"' + fields[j]['name'] + '": ' + moment($('#input' + fields[j]['name']).val(), fields[j]['format']);
+                        data[fields[j]['name']] = $('#input' + fields[j]['name']).val();
                     }
                     else if (fields[j]['datatype'] == 'image') {
-                        if (isFirst)
-                            isFirst = false;
-                        else
-                            data += ", ";
-
-                        data += '"' + fields[j]['name'] + '": "' + $('#input' + fields[j]['name']).attr("src") + '"';
+                        data[fields[j]['name']] = $('#input' + fields[j]['name']).attr("src");
                     }
                     else if (fields[j]['datatype'] == 'enum') {
-                        if (isFirst)
-                            isFirst = false;
-                        else
-                            data += ", ";
-
-                        data += '"' + fields[j]['name'] + '": "' + $('#input' + fields[j]['name']).selectpicker('val') + '"';
+                        data[fields[j]['name']] = $('#input' + fields[j]['name']).selectpicker('val');
                     }
                     else if (fields[j]['datatype'] == 'int') {
-                        if (isFirst)
-                            isFirst = false;
-                        else
-                            data += ", ";
-
                         if (fields[j]['reff'] != null)
-                            data += '"' + fields[j]['name'] + '": ' + $('#input' + fields[j]['name']).data("id");
+                            data[fields[j]['name']] = $('#input' + fields[j]['name']).data("id");
                         else
-                            data += '"' + fields[j]['name'] + '": ' + $('#input' + fields[j]['name']).val();
+                            data[fields[j]['name']] = $('#input' + fields[j]['name']).val();
                     }
                     else {
-                        if (isFirst)
-                            isFirst = false;
-                        else
-                            data += ", ";
-
                         if (fields[j]['reff'] != null)
-                            data += '"' + fields[j]['name'] + '": "' + $('#input' + fields[j]['name']).data("id") + '"';
+                            data[fields[j]['name']] = $('#input' + fields[j]['name']).data("id");
                         else
-                            data += '"' + fields[j]['name'] + '": "' + $('#input' + fields[j]['name']).val() + '"';
+                            data[fields[j]['name']] = $('#input' + fields[j]['name']).val();
                     }
                 }
 
-                data += "}";
-
-                //console.log(data);
-                //console.log(JSON.parse(data));
-
                 waitingDialog.show('Please wait', { dialogSize: 'sm', progressType: 'warning' });
-                $.post(that.gridAddUpdateData, JSON.parse(data), function (result) {
+                $.post(that.gridAddUpdateData, data, function (result) {
                     if (result.total >= 0) {
                         that.getData();
                         $('#' + that.gridName + 'AddEditModal').modal('hide');
