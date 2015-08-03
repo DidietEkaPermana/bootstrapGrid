@@ -1,5 +1,5 @@
 ﻿//! bootstrapGrid.js
-//! version : 0.0.4
+//! version : 1.0.0
 //! authors : Didiet Eka Permana (didiet.permana@gmail.com)
 //! license : MIT
 
@@ -28,13 +28,26 @@ if (typeof jQuery === 'undefined') {
         this.totalRow = 0;
         this.serverAction = false;
         this.gridName = element.id;
-        this.gridAddUpdateData = options.gridAddUpdateData;
-        this.gridGetData = options.gridGetData;
-        this.gridDeleteData = options.gridDeleteData;
         this.pageSizeOption = options.pageSizeOption;
         this.fields = options.fields;
         this.nullImage = options.nullImage;
         this.serverAction = options.serverAction;
+        this.transport = options.transport;
+
+        if (!this.transport["type"])
+            this.transport["type"] = "API";
+
+        if (!this.transport["create"]["method"])
+            this.transport["create"]["method"] = "POST";
+
+        if (!this.transport["read"]["method"])
+            this.transport["read"]["method"] = "GET";
+
+        if (!this.transport["update"]["method"])
+            this.transport["update"]["method"] = "PUT";
+
+        if (!this.transport["delete"]["method"])
+            this.transport["delete"]["method"] = "DELETE";
 
         //reff
         this.isReff = options.IsReff;
@@ -48,7 +61,7 @@ if (typeof jQuery === 'undefined') {
         this.init(element);
     };
 
-    Grid.VERSION = '0.0.4'
+    Grid.VERSION = '1.0.0'
 
     Grid.prototype = {
         constructor: Grid,
@@ -314,28 +327,53 @@ if (typeof jQuery === 'undefined') {
 
             waitingDialog.show('Please wait', { dialogSize: 'sm', progressType: 'warning' });
 
-            $.post(this.gridGetData, postData, function (result) {
-                if (result.total > 0) {
-                    that.dataGrid = result.payload;
-                    that.totalRow = result.total;
-                    that.refreshGrid();
-                    waitingDialog.hide();
-                }
-                else if (result.errors != null && result.errors.length > 0) {
-                    waitingDialog.hide();
-                    alert(result.errors);
-                }
-                else if (result.total == 0) {
-                    waitingDialog.hide();
-                    $("#" + this.gridName + "Table_Content").empty();
-                    var htmlContent = '<tr>';
-                    htmlContent += '<td colspan="' + this.fields.length + '">No data exists</td>';
-                    htmlContent += '</tr>';
-                    $("#" + this.gridName + "Table_Content").append(htmlContent);
+            $.ajax({
+                method: this.transport.read.method,
+                url: this.transport.read.url,
+                data: postData
+            }).success(function (result) {
+                if (that.transport.type == "API") {
+                    if (result.total > 0) {
+                        that.dataGrid = result.payload;
+                        that.totalRow = result.total;
+                        that.refreshGrid();
+                        waitingDialog.hide();
+                    }
+                    else if (result.errors != null && result.errors.length > 0) {
+                        alert(result.errors);
+                    }
+                    else if (result.total == 0) {
+                        waitingDialog.hide();
+                        $("#" + that.gridName + "Table_Content").empty();
+                        var htmlContent = '<tr>';
+                        htmlContent += '<td colspan="' + fields.length + '">No data exists</td>';
+                        htmlContent += '</tr>';
+                        $("#" + that.gridName + "Table_Content").append(htmlContent);
+                    }
+                    else {
+                        waitingDialog.hide();
+                        alert("Generic error");
+                    }
                 }
                 else {
-                    waitingDialog.hide();
-                    alert("Generic error");
+                    if (result.value.length > 0) {
+                        that.dataGrid = result.value;
+                        that.totalRow = result.value.length;
+                        that.refreshGrid();
+                        waitingDialog.hide();
+                    }
+                    else if (result.value.length == 0) {
+                        waitingDialog.hide();
+                        $("#" + that.gridName + "Table_Content").empty();
+                        var htmlContent = '<tr>';
+                        htmlContent += '<td colspan="' + fields.length + '">No data exists</td>';
+                        htmlContent += '</tr>';
+                        $("#" + that.gridName + "Table_Content").append(htmlContent);
+                    }
+                    else {
+                        waitingDialog.hide();
+                        alert("Generic error");
+                    }
                 }
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 waitingDialog.hide();
@@ -647,19 +685,39 @@ if (typeof jQuery === 'undefined') {
             var that = arg.data;
             if (confirm("Are you sure you want to delete this record?")) {
                 waitingDialog.show('Please wait', { dialogSize: 'sm', progressType: 'warning' });
-                $.post(that.gridDeleteData, { "__RequestVerificationToken": RequestVerificationToken, ID: $(this).data("id") }, function (result) {
-                    if (result.total >= 0) {
-                        waitingDialog.hide();
-                        alert("Record deleted");
-                        that.getData();
-                    }
-                    else if (result.errors.length > 0) {
-                        waitingDialog.hide();
-                        alert(result.errors);
+
+                var urlString = that.transport.delete.url;
+                if (that.transport.delete.method != "POST") {
+                    if (that.transport.type == "API")
+                        urlString += "/" + $(this).data("id");
+                    else
+                        urlString += "(" + $(this).data("id") + ")";
+                }
+
+                $.ajax({
+                    method: that.transport.delete.method,
+                    url: urlString,
+                    data: { "__RequestVerificationToken": RequestVerificationToken, id: $(this).data("id") }
+                }).success(function (result) {
+                    if (that.transport.type == "API") {
+                        if (result.total >= 0) {
+                            waitingDialog.hide();
+                            alert("Record deleted");
+                            that.getData();
+                        }
+                        else if (result.errors.length > 0) {
+                            waitingDialog.hide();
+                            alert(result.errors);
+                        }
+                        else {
+                            waitingDialog.hide();
+                            alert("Generic error");
+                        }
                     }
                     else {
                         waitingDialog.hide();
-                        alert("Generic error");
+                        alert("Record deleted");
+                        that.getData();
                     }
                 }).fail(function (jqXHR, textStatus, errorThrown) {
                     waitingDialog.hide();
@@ -721,24 +779,85 @@ if (typeof jQuery === 'undefined') {
                 }
 
                 waitingDialog.show('Please wait', { dialogSize: 'sm', progressType: 'warning' });
-                $.post(that.gridAddUpdateData, data, function (result) {
-                    if (result.total >= 0) {
-                        that.getData();
-                        $('#' + that.gridName + 'AddEditModal').modal('hide');
+
+                var key = "";
+
+                for (var i = 0; i < that.keyFields.length; i++) {
+                    key = data[that.keyFields[i]['name']];
+                }
+
+                data["id"] = key;
+
+                if (key == 0) {
+                    $.ajax({
+                        method: that.transport.create.method,
+                        url: that.transport.create.url,
+                        data: data
+                    }).success(function (result) {
+                        if (that.transport.type == "API") {
+                            if (result.total >= 0) {
+                                $('#' + that.gridName + 'AddEditModal').modal('hide');
+                                that.getData();
+                                waitingDialog.hide();
+                            }
+                            else if (result.errors.length > 0) {
+                                waitingDialog.hide();
+                                alert(result.errors);
+                            }
+                            else {
+                                waitingDialog.hide();
+                                alert("Generic error");
+                            }
+                        }
+                        else {
+                            $('#' + that.gridName + 'AddEditModal').modal('hide');
+                            that.getData();
+                            waitingDialog.hide();
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
                         waitingDialog.hide();
+                        alert("Got some error: " + errorThrown);
+                    });
+                }
+                else {
+                    var urlString = that.transport.update.url;
+                    if (that.transport.update.method != "POST") {
+                        if(that.transport.type == "API")
+                            urlString += "/" + key;
+                        else
+                            urlString += "(" + key + ")";
                     }
-                    else if (result.errors.length > 0) {
+
+                    $.ajax({
+                        method: that.transport.update.method,
+                        url: urlString,
+                        data: data
+                    }).success(function (result) {
+                        if (that.transport.type == "API") {
+                            if (result.total >= 0) {
+                                $('#' + that.gridName + 'AddEditModal').modal('hide');
+                                that.getData();
+                                waitingDialog.hide();
+                            }
+                            else if (result.errors.length > 0) {
+                                waitingDialog.hide();
+                                alert(result.errors);
+                            }
+                            else {
+                                waitingDialog.hide();
+                                alert("Generic error");
+                            }
+                        }
+                        else {
+                            $('#' + that.gridName + 'AddEditModal').modal('hide');
+                            that.getData();
+                            waitingDialog.hide();
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
                         waitingDialog.hide();
-                        alert(result.errors);
-                    }
-                    else {
-                        waitingDialog.hide();
-                        alert("Generic error");
-                    }
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    waitingDialog.hide();
-                    alert("Got some error: " + errorThrown);
-                });
+                        alert("Got some error: " + errorThrown);
+                    });
+                }
             }
         },
 

@@ -24,14 +24,17 @@
             $('#@ViewBag.Title').grid({
                 pageSizeOption: [5, 10, 15, 25, 50],
                 fields: [
-                    { title: 'ID', name: 'OccupationId', datatype: 'int', key: true },
+                    { title: 'ID', name: 'OccupationId', datatype: 'int', key: true, display: false },
                     { title: 'Occupation', name: 'OccupationName', datatype: 'string' }
                 ],
                 //serverAction: true, //newly added, if paging and search, it would take query to server
-                gridAddUpdateData: "/Occupation/AddUpdateOccupation",
-                gridGetData: "/Occupation/GetOccupationList",
-                //gridGetData: "/Occupation/ReadOccupation",
-                gridDeleteData: "/Occupation/DeleteOccupation"
+                transport: {
+                    //type: 'API',
+                    create: { url: "/Occupation/Post", method: "POST" },
+                    read: { url: "/Occupation/Get", method: "POST" },
+                    update: { url: "/Occupation/Put", method: "POST" },
+                    delete: { url: "/Occupation/Delete", method: "POST" }
+                }
             });
         })
     </script>

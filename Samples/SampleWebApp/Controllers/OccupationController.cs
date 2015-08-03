@@ -25,26 +25,7 @@ namespace SampleWebApp.Controllers
         }
 
         #region API request
-        public async Task<JsonResult> AddUpdateOccupation(Occupation dataOccupation)
-        {
-            JsonData data = new JsonData();
-
-            try
-            {
-                if (dataOccupation.OccupationId == 0)
-                    return await CreateOccupation(dataOccupation);
-                else
-                    return await UpdateOccupation(dataOccupation);
-            }
-            catch (Exception ex)
-            {
-                data.errors = ex.Message;
-            }
-
-            return Json(data);
-        }
-
-        private async Task<JsonResult> CreateOccupation(Occupation dataOccupation)
+        public async Task<JsonResult> Post(Occupation dataOccupation)
         {
             JsonData data = new JsonData();
 
@@ -67,7 +48,7 @@ namespace SampleWebApp.Controllers
         }
 
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> GetOccupationList()
+        public async Task<JsonResult> Get()
         {
             JsonData data = new JsonData();
 
@@ -113,7 +94,7 @@ namespace SampleWebApp.Controllers
             return Json(data);
         }
 
-        private async Task<JsonResult> UpdateOccupation(Occupation dataOccupation)
+        public async Task<JsonResult> Put(int id, Occupation dataOccupation)
         {
             JsonData data = new JsonData();
 
@@ -135,7 +116,7 @@ namespace SampleWebApp.Controllers
         }
 
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> DeleteOccupation(int id)
+        public async Task<JsonResult> Delete(int id)
         {
             JsonData data = new JsonData();
 
